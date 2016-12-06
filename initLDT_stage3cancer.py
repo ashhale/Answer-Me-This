@@ -2,6 +2,9 @@
 
 # import LearningDecisionTree
 from LearningDecisionTree import *
+import subprocess
+import webbrowser
+import os
 
 training_datafile = "stage3cancer.csv"
 training_datafile2 = "stage3cancer_v2.csv"

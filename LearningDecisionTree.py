@@ -27,7 +27,6 @@
 import DecisionTree
 from DecisionTree.DecisionTree import sample_index
 from DecisionTree.DecisionTree import convert
-from __builtin__ import True, str
 import sys
 import re
 from numbers import Number
@@ -53,6 +52,7 @@ class LearningDecisionTree(DecisionTree.DecisionTree):
         super(LearningDecisionTree, self).__init__(*args, **kwargs )
 
         self._answers = {}              # See startQandA()
+        self._path = []                 # See startQandA()
         self._recording = False         # See startQandA()
         self._nodeDict = None           # See getNodeDict()
 
@@ -226,6 +226,8 @@ class LearningDecisionTree(DecisionTree.DecisionTree):
                 for fv in child.get_branch_features_and_values_or_thresholds():
                     f, v = fv.split('=')
                     if f == feature and convert(v) == test_value:
+                        if self._recording:
+                            self._path.append(child.get_serial_num())
                         return child
         else:
             found = False
@@ -249,6 +251,8 @@ class LearningDecisionTree(DecisionTree.DecisionTree):
                         else:
                             found = False
                 if found:
+                    if self._recording:
+                        self._path.append(child.get_serial_num())
                     return child
         
         return None
@@ -312,8 +316,8 @@ class LearningDecisionTree(DecisionTree.DecisionTree):
         Returns the record ID of the new record, or zero on failure.
 
         TODO: Doc Note: In checkpoint 2, code comments said no new feature
-        names were permitted, but they are now. Also at checkpoint 2, code
-        comments said this function returns True or False.
+        names were permitted, but they are now (except for a bug). Also at
+        checkpoint 2, code comments said this function returns True or False.
         '''
         ########################################################################
         # Validate and analyze newRecord
@@ -528,24 +532,24 @@ class LearningDecisionTree(DecisionTree.DecisionTree):
 
     def startQandA(self):
         '''
-        Start recording feature-value pairs from calls to chooseChild(),
-        clearing any previously recorded answers
+        Start recording feature-value pairs and node moves from calls to
+        chooseChild(), clearing any previously recorded answers and path.
         '''
-        if self._answers:
-            self._answers.clear()
+        self._answers.clear()
+        self._path = [self._root_node.get_serial_num()]
         self._recording = True
 
     def stopQandA(self):
         '''
-        Stop recording feature-value pairs from calls to chooseChild(), 
-        keeping any previously recorded answers
+        Stop recording feature-value pairs and node moves from calls to
+        chooseChild(), keeping any previously recorded answers
         '''
         self._recording = False
 
     def resumeQandA(self):
         '''
-        Resume recording feature-value pairs from calls to chooseChild(), 
-        keeping any previously recorded answers
+        Resume recording feature-value pairs and node moves from calls to
+        chooseChild(), keeping any previously recorded answers
         '''
         self._recording = True
 
@@ -553,8 +557,19 @@ class LearningDecisionTree(DecisionTree.DecisionTree):
         '''
         Return a dictionary of the recorded feature-value pairs from calls
         to chooseChild().
+        
+        The length of this dictionary may be shorter than the length of the
+        list from getQandAPath since this dictionary will have only one
+        entry per feature tested, regardless of how many nodes were used to
+        test that same feature.
         '''
         return self._answers
+
+    def getQandAPath(self):
+        '''
+        Return a list of the recorded node moves from calls to chooseChild().
+        '''
+        return self._path
 
     def seedTrainingRecordWithQandA(self, classValue = 'NA'):
         '''
@@ -624,6 +639,76 @@ class LearningDecisionTree(DecisionTree.DecisionTree):
         if len(node.get_children()) > 0:
             for child in node.get_children():
                 self.recurseNodeDict(child)
+    
+    def train(self, displayMoves = False):
+        '''
+        Recursively prompt the user to answer questions until reaching a leaf
+        node, and return a seeded partial training record (see
+        seedTrainingRecordWithQandA).
+        
+        If displayMoves is True, after each question is answered, a message
+        is displayed saying which node was reached.
+        
+        To get the full path of all nodes visited at the end of training,
+        including intermediate nodes, see getQandAPath.
+        
+        This is intended as a simple demonstration of how to use the other
+        methods in LearningDecisionTree to record Q&A from a user navigating
+        the tress to produce the "first draft" of a new training record. A
+        more fleshed-out UI would take this seeded training record, prompt the
+        user to modify it further, and then add the new training record to the
+        training data set (see addTrainingRecord and saveTrainingData).
+        '''
+        node = self._root_node
+        self.startQandA()                       # Start recording
+        while len(node.get_children()) > 0:
+            value = self.prompt(node)
+            prevNode = node
+            node = self.getDeepestChildForFeature(node, value)
+            if displayMoves:
+                print "Moved to node %d" % node.get_serial_num(),
+                # Show intermediate nodes, if any
+                prevIdx = self._path.index(prevNode.get_serial_num())
+                curIdx = self._path.index(node.get_serial_num())
+                interEdges = curIdx - prevIdx - 1
+                m = ''
+                if interEdges > 0:
+                    m += " (via node%s %d" % ('s' if interEdges > 1 else '',
+                                               self._path[prevIdx + 1])
+                    for i in range(interEdges - 1):
+                        m += ", %d" % self._path[prevIdx + i + 2]
+                    m += ")"
+                print m                         # End of "Moved to node" line
+            print                               # Blank between prompts
+
+        return self.seedTrainingRecordWithQandA()
+            
+    def prompt(self, node):
+        '''
+        Prompt the user for a value for the feature test of a single node,
+        validating the input and re-prompting for bad input.
+        
+        Return the user's reply
+        
+        TODO: Add a nice way for the user to quit instead of answering
+        '''
+        reply = None
+        symPrefix = 'Enter one of'
+        numPrefix = "Enter a value in the range"
+        symbolic, values, question = self.getQuestionAndValues(node)
+        entryLine = '%s: %s ' % (symPrefix if symbolic else numPrefix, values)
+
+        print question
+        while not reply:
+            reply = convert(raw_input(entryLine).strip())
+            if symbolic and reply not in values:
+                reply = None
+            elif not symbolic and (reply < values[0] or reply > values[1]):
+                reply = None
+        
+        return reply
+                
+                
     
 #--------------------------  Global Helper Functions  --------------------------
 
