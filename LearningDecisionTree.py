@@ -19,6 +19,10 @@
 #     generate a very nice graphical tree. For example, assuming getDOT()
 #     wrote its output to the file my_graph.dot, you can generate the file
 #     my_graph.dot.svg via the command line: dot -Tsvg -O my_graph.dot
+#
+# TODO: Allow for adding new class values (via seedTrainingRecordWithQandA),
+# new feature values (via new allowNewValues argument in chooseChild and
+# getDeepestChildForFeature), and new feature names (via ???)
 
 import DecisionTree
 from DecisionTree.DecisionTree import sample_index
@@ -26,6 +30,7 @@ from DecisionTree.DecisionTree import convert
 from __builtin__ import True, str
 import sys
 import re
+from numbers import Number
 
 class LearningDecisionTree(DecisionTree.DecisionTree):
     '''
@@ -39,12 +44,17 @@ class LearningDecisionTree(DecisionTree.DecisionTree):
         updated training data; if not supplied, sys.stdout will be used
     '''
     def __init__(self, *args, **kwargs  ):
-        # super() throws exceptions for unknown arguments, so we must
-        # extract new LearningDecisionTree arguments before calling super()
+        # super() throws exceptions for unknown arguments, so we must extract
+        # new LearningDecisionTree-specific arguments before calling super()
         self._save_training_datafile = None
         if 'save_training_datafile' in kwargs:
             self._save_training_datafile = kwargs.pop('save_training_datafile')
+
         super(LearningDecisionTree, self).__init__(*args, **kwargs )
+
+        self._answers = {}              # See startQandA()
+        self._recording = False         # See startQandA()
+        self._nodeDict = None           # See getNodeDict()
 
     def getDOT(self, prefix = 'node [shape=box]\n',
                outFile = None, allProbsOnLeaf = False):
@@ -72,7 +82,7 @@ class LearningDecisionTree(DecisionTree.DecisionTree):
         
     def recurseDOT(self, node, allProbsOnLeaf = False):
         '''
-        Recursive helper function used by getDOT.
+        Recursive helper function used by getDOT().
 
         Produce a DOT line for a label for node. Non-leaf nodes display the
         feature they test with. By default, leaf nodes display the most likely
@@ -125,7 +135,7 @@ class LearningDecisionTree(DecisionTree.DecisionTree):
         
         return ''.join(dotList)
 
-    def getQuestionAndValues(self, node):
+    def  getQuestionAndValues(self, node):
         '''
         Return info about a DTNode's feature test, sufficient to create a
         nicely formatted question or prompt and error-check the user's input.
@@ -166,11 +176,20 @@ class LearningDecisionTree(DecisionTree.DecisionTree):
 
     def chooseChild(self, node, value):
         '''
-        Given a DTNode and a value for its feature test, return the selected
+        Given a DTNode and a value for its feature  test, return the selected
         child DTNode.
         
         If node is a leaf or no child matched value, return None.
         The value must already exist in the training data.
+        
+        If recording is enabled, will add feature/value to recording
+        dictionary. See startQandA().
+        
+        TODO: Maybe add a new argument (allowNewValues = False) which, if
+        True, would skip the tests against known values. If this did not
+        cause problems elsewhere, it could be an approach for adding new
+        values to a feature in the training data. Would also need to add
+        allowNewValues argument to getDeepestChildForFeature.
 
         TODO: Doc Note: This changed from checkpoint 2. Feature was an
         unnecessary argument so removed it. In checkpoint 2, the function
@@ -181,6 +200,9 @@ class LearningDecisionTree(DecisionTree.DecisionTree):
         
         test_value = convert(value)
         feature = node.get_feature()
+        if self._recording:
+            self._answers[feature] = test_value
+
         symbolic = self.isSymbolicFeature(feature)
         values = None
         if symbolic:
@@ -188,6 +210,7 @@ class LearningDecisionTree(DecisionTree.DecisionTree):
         else:
             values = self._numeric_features_valuerange_dict[feature]
 
+        # TODO: Maybe skip these tests if new argument allowNewValues == True??
         if symbolic and test_value not in values:
             raise Exception(
                 "Value '%s' not in known values %s for feature '%s' at node %u"
@@ -241,6 +264,12 @@ class LearningDecisionTree(DecisionTree.DecisionTree):
         None.
         
         The value must already exist in the training data.
+
+        TODO: Maybe add a new argument (allowNewValues = False) which, if
+        True, would skip the tests against known values. If this did not
+        cause problems elsewhere, it could be an approach for adding new
+        values to a feature in the training data. Would also need to add
+        allowNewValues argument to chooseChild.
         '''
         feature = node.get_feature()
 
@@ -254,15 +283,180 @@ class LearningDecisionTree(DecisionTree.DecisionTree):
 
     def addTrainingRecord(self, newRecord):
         '''
-        Accept a new training record as a python Dictionary.
-
-        Keys must be the same as the existing keys in the training data
-        (i.e., the same names for the class and features).
+        Accept a new training record as a python Dictionary, optionally
+        regenerating the tree.
         
-        Return true or false on success or failure.
+        If newRecord includes a new feature, existing training records will be
+        extended to include the new feature with a value of 'NA'.
+        newRecord may include a new value for class or any existing feature. 
+        
+        TODO: A new feature fails at construct_decision_tree_classifier(),
+        need to debug
+        TODO: A new class value appears to require that there be no NA fields
+        in the new record, but works if no NAs
+        New numeric feature value out of previous range seems to work.
+        New symbolic feature value seems to work.
+        
+        After this call, the tree is in an inconsistent state and this should be
+        followed by the usual setup function calls, something like:
+            dt.calculate_first_order_probabilities()                # Required
+            dt.calculate_class_priors()                             # Required
+            root_node = dt.construct_decision_tree_classifier()     # Required
+        It should be OK to call addTrainingRecord() repeatedly before making
+        the three calls above, but other tree operations are not to be trusted
+        until the three calls above are completed.
+        
+        This function will raise Exceptions if the newRecord fails validation.
+        TODO: Add notes here about what validation is done.
+        
+        Returns the record ID of the new record, or zero on failure.
+
+        TODO: Doc Note: In checkpoint 2, code comments said no new feature
+        names were permitted, but they are now. Also at checkpoint 2, code
+        comments said this function returns True or False.
         '''
-        # TODO: Stub function, implement for real
-        return True
+        ########################################################################
+        # Validate and analyze newRecord
+        ########################################################################
+        newClassValue = None
+        newFeatureNames = []
+        newFeatureValues = {}
+        className = self._class_names[0].split('=')[0]
+        classValues = [self._class_names[x].split('=')[1]
+                       for x in range(len(self._class_names))]
+        newFeatureDict = dict([(x, newRecord[x]) for x in newRecord.keys() if x != className])
+        
+        # Ensure newRecord has entries for the class and all existing features
+        if className not in newRecord:
+            raise Exception('newRecord missing entry for class "%s"'
+                            % className)
+        for f in self._feature_names:
+            if f not in newRecord:
+                raise Exception('newRecord missing entry for feature "%s"' % f)
+        
+        # Determine if there are new class/feature values or new feature names
+        if newRecord[className] not in classValues:
+            newClassValue = newRecord[className]
+        for key in newFeatureDict.keys():
+            if key not in self._feature_names:
+                newFeatureNames.append(key)
+            elif newRecord[key] not in self._features_and_unique_values_dict[key]:
+                newFeatureValues.update([(key, newRecord[key])])
+
+        ########################################################################
+        # Prepare some values for use below
+        ########################################################################
+        
+        # Existing record IDs are not necessarily sequential, as DecisionTree
+        # only requires that they be unique
+        newID = max([int(self._samples_class_label_dict.keys()[y].split('_')[1])
+                     for y in range(len(self._samples_class_label_dict))]) + 1
+        newSampleName = 'sample_' + str(newID)
+        newClassLabel = className + '=' + str(newRecord[className])
+        
+        ########################################################################
+        # Need to update 9 variables, as per examination of
+        # DecisionTree.get_training_data(). See numbered comments below.
+        ########################################################################
+        
+        # 1. self._how_many_total_training_samples
+        #    Simple increment
+        self._how_many_total_training_samples += 1
+        
+        # 2. self._class_names
+        #    Add an entry if newRecord contains a new class value
+        if newClassValue:
+            self._class_names.append(className + '=' + str(newClassValue))
+        
+        # 3. self._feature_names
+        #    Add entries if newRecord contains new feature names
+        if newFeatureNames:
+            self._feature_names.extend(newFeatureNames)
+        
+        # 4. self._samples_class_label_dict
+        #    Add an entry for newRecord
+        self._samples_class_label_dict.update([(newSampleName, newClassLabel)])
+        
+        # 5. self._training_data_dict
+        #    If new feature name, add feature name with default value to all
+        #    Add an entry for newRecord
+        for f in newFeatureNames: 
+            for key in self._training_data_dict:
+                self._training_data_dict[key].append(f + '=NA')
+            
+        self._training_data_dict.update([(newSampleName,
+                                          [x + '=' + str(newRecord[x])
+                                           for x in newFeatureDict.keys()])])
+        
+        # 6. self._features_and_values_dict
+        #    Add newRecord's value to each entry
+        #    If new feature name, add feature name with newRecord's value
+        #        and enough copies of default value for all other records
+        for f in self._features_and_values_dict:
+            self._features_and_values_dict[f].append(newRecord[f])
+        
+        numNA = self._how_many_total_training_samples - 1
+        for f in newFeatureNames:
+            self._features_and_values_dict[f] = [newRecord[f]]
+            self._features_and_values_dict[f].extend(['NA'
+                                                      for x in range(numNA)])
+        
+        # 7. self._features_and_unique_values_dict
+        #    Add newRecord's value to each entry if value not already present
+        #    If new feature name, add feature name with newRecord's value
+        for f in self._features_and_unique_values_dict:
+            if newRecord[f] not in self._features_and_unique_values_dict[f]:
+                self._features_and_unique_values_dict[f].append(newRecord[f])
+
+        for f in newFeatureNames:
+            self._features_and_unique_values_dict.update([(f, newRecord[f])])
+        
+        # 8. self._numeric_features_valuerange_dict
+        #    For each newRecord value, extend range per feature as needed
+        #    If new feature name, add feature name with single-value range
+        for f in self._numeric_features_valuerange_dict:
+            val = convert(newRecord[f])
+            if not isinstance(val, Number):
+                # TODO: Do we need something more here or will regenerating
+                # the tree harmlessly turn f into a symbolic feature?
+                continue        # If newRecord's value is not a number, ditch
+            low, high = self._numeric_features_valuerange_dict[f]
+            self._numeric_features_valuerange_dict[f] = [min(low, val),
+                                                         max(high, val)]
+
+        for f in newFeatureNames:
+            self._numeric_features_valuerange_dict[f] = [convert(newRecord[f]),
+                                                         convert(newRecord[f])]
+
+        # 9. self._feature_values_how_many_uniques_dict
+        #    Update with new len() of each self._features_and_unique_values_dict
+        #    If new feature name, add new name with count of 1
+        for f in self._feature_values_how_many_uniques_dict:
+            self._feature_values_how_many_uniques_dict[f] = \
+            len(self._features_and_unique_values_dict[f])
+        
+        for f in newFeatureNames:
+            self._feature_values_how_many_uniques_dict.update([(f, 1)])
+
+        ########################################################################
+        # Reset a bunch of "self" fields in DecisionTree, found in the
+        # DecisionTree constructor.  Unless we do this, one or more of
+        # these calls fail with a variety of errors, like divide by zero:
+        #    dt.calculate_first_order_probabilities()                # Required
+        #    dt.calculate_class_priors()                             # Required
+        #    root_node = dt.construct_decision_tree_classifier()     # Required
+        ########################################################################
+
+        self._root_node                                     =      None
+        self._probability_cache                             =      {}
+        self._entropy_cache                                 =      {}
+        self._class_priors_dict                             =      {}
+        self._sampling_points_for_numeric_feature_dict      =      {}
+        self._prob_distribution_numeric_features_dict       =      {}
+        self._histogram_delta_dict                          =      {}
+        self._num_of_histogram_bins_dict                    =      {}
+
+        return newID
 
     def getFeatureValues(self, node):
         '''
@@ -271,9 +465,14 @@ class LearningDecisionTree(DecisionTree.DecisionTree):
         
         The Dictionary will include the class and all features, with some values
         missing as indicated by the value None.
+        
+        TODO: Doc Note: This function was included in checkpoint 2 but is no
+        longer needed. Instead, use the recording feature and then getQandA()
+        and/or seedTrainingRecordWithQandA()
         '''
         # TODO: Stub function, implement for real
-        return {"class":"human", "height":"short", "size":None}
+        # return {"class":"human", "height":"short", "size":None}
+        raise NotImplementedError('Function getFeatureValues is not implemented')
 
     def saveTrainingData(self):
         '''
@@ -284,6 +483,11 @@ class LearningDecisionTree(DecisionTree.DecisionTree):
 
         TODO: Currently data may be written in different column order
         than the original training file.
+        
+        TODO: Doc Note: This changed from checkpoint 2. If the argument
+        save_training_datafile was supplied in the constructor, use that as the
+        output file, otherwise write to sys.stdout.
+        In checkpoint 2, planned to overwrite existing input training data file. 
 
         Return true or false on success or failure.
         '''
@@ -320,6 +524,60 @@ class LearningDecisionTree(DecisionTree.DecisionTree):
         
         return True
 
+#------------  LearningDecisionTree Recording Management Functions  ------------
+
+    def startQandA(self):
+        '''
+        Start recording feature-value pairs from calls to chooseChild(),
+        clearing any previously recorded answers
+        '''
+        if self._answers:
+            self._answers.clear()
+        self._recording = True
+
+    def stopQandA(self):
+        '''
+        Stop recording feature-value pairs from calls to chooseChild(), 
+        keeping any previously recorded answers
+        '''
+        self._recording = False
+
+    def resumeQandA(self):
+        '''
+        Resume recording feature-value pairs from calls to chooseChild(), 
+        keeping any previously recorded answers
+        '''
+        self._recording = True
+
+    def getQandA(self):
+        '''
+        Return a dictionary of the recorded feature-value pairs from calls
+        to chooseChild().
+        '''
+        return self._answers
+
+    def seedTrainingRecordWithQandA(self, classValue = 'NA'):
+        '''
+        Return a partial training record as a python dictionary, based on the
+        recorded Q&A so far and a supplied class value. Missing values are
+        seeded as 'NA'.
+        
+        The classValue is not limited to existing values, so this can be used
+        to create new class values if passed to addTrainingRecord().
+        '''
+        # Start the record with the pair class name:classValue
+        newValue = convert(classValue)
+        newRecord = {self._class_names[0].split('=')[0] : newValue}
+        
+        # Add every feature name with the value 'NA'
+        for f in self._feature_names:
+            newRecord.update([(f, 'NA')])
+        
+        # Update any feature:value pairs from recording
+        newRecord.update(self._answers)
+        
+        return newRecord
+        
 #----------------  LearningDecisionTree Class Helper Functions  ----------------
 
     def isNumericFeature(self, feature):
@@ -343,6 +601,29 @@ class LearningDecisionTree(DecisionTree.DecisionTree):
         See https://engineering.purdue.edu/kak/distDT/DecisionTree-3.4.3.html#5
         '''
         return not self.isNumericFeature(feature)
+    
+    def getNodeDict(self):
+        '''
+        Return a dictionary of all Nodes, keyed by the node serial numbers.
+        
+        This can probably be inefficient so the dictionary is not created until
+        this function is called, and is cached for later use.
+        '''
+        if self._nodeDict:
+            return self._nodeDict
+
+        self._nodeDict = {}
+        self.recurseNodeDict(self._root_node)
+        return self._nodeDict
+        
+    def recurseNodeDict(self, node):
+        '''
+        Recursive helper function used by getNodeDict()
+        '''
+        self._nodeDict[node.get_serial_num()] = node
+        if len(node.get_children()) > 0:
+            for child in node.get_children():
+                self.recurseNodeDict(child)
     
 #--------------------------  Global Helper Functions  --------------------------
 
@@ -478,8 +759,8 @@ if __name__ == '__main__':
 
     ############################################################################
     printBox("Test getDOT")
-    print dt.getDOT(outFile = 'test_get_dot.dot')
-    # print dt.getDOT(outFile = 'test_get_dot.dot', allProbsOnLeaf = True)
+    # print dt.getDOT(outFile = 'test_get_dot.dot')
+    print dt.getDOT(outFile = 'test_get_dot.dot', allProbsOnLeaf = True)
     
     ############################################################################
     printBox("Test getQuestionAndValues")
@@ -520,7 +801,8 @@ if __name__ == '__main__':
         print "No child found\n"
 
     ############################################################################
-    printBox("Test getDeepestChildForFeature")
+    printBox("Test getDeepestChildForFeature and recording")
+    dt.startQandA()
     n = dt.getDeepestChildForFeature(root_node, 2.0)
     n.display_node()
     n = dt.getDeepestChildForFeature(n, 4.0)
@@ -534,14 +816,37 @@ if __name__ == '__main__':
         n.display_node()
     else:
         print "No child found\n"
+    seed = dt.seedTrainingRecordWithQandA()
+    print "New training record seeded from Q&A recording\n"
+    print seed
     
     ############################################################################
     printBox("Test addTrainingRecord")
-    print dt.addTrainingRecord(None)
+    newRec = dict(seed)
+#     newRec['"eet"'] = 2.0               # Fill in NA value
+#     newRec['"ploidy"'] = '"diploid"'    # Fill in NA value
+    newRec['"pgstat"'] = 0      # Existing class value
+#     newRec['"g2"'] = 2.4        # Existing numeric value in previous range [2.4, 54.93]
+#     newRec['"pgstat"'] = 2      # New class value
+#     newRec['"g2"'] = 2.1        # New numeric value out of previous range [2.4, 54.93]
+    newRec['"ploidy"'] = 'blah' # New symbolic value, no surrounding double quotes
+#     newRec.update([('weight', 190)])    # New feature, no surrounding double quotes
+    print "Proposed new record to add, modified from seed record\n"
+    print newRec
+    
+    print "Added new training record ID %d" % dt.addTrainingRecord(newRec)
 
+    dt.calculate_first_order_probabilities()                # Required
+    dt.calculate_class_priors()                             # Required
+    # dt.show_training_data()                                 # Optional        
+    root_node = dt.construct_decision_tree_classifier()     # Required
+
+    # print dt.getDOT(outFile = 'test_get_dot.dot')
+    print dt.getDOT(outFile = 'test_get_dot_v2.dot', allProbsOnLeaf = True)
+    
     ############################################################################
-    printBox("Test getFeatureValues")
-    print dt.getFeatureValues(root_node)
+    # printBox("Test getFeatureValues")
+    # print dt.getFeatureValues(root_node)
 
     ############################################################################
     printBox("Test saveTrainingData")

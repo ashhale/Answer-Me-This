@@ -1,0 +1,91 @@
+Demo 1: Tree Diagram
+============================
+
+Start with 4 things open: 2 command prompts and a windows explorer all
+in the same directory, plus a browser open
+
+In Command Prompt 1:
+python                                  # Start python
+execfile('initLDT_stage3cancer.py')     # Create LDT with stage3cancer data
+dt, root = dt1()                            # dt1() reads from stage3cancer.csv
+                                            # and writes to stage3cancer_v2.csv
+dt.getDOT(outFile = 'test.dot')         # Generate file test.dot
+
+
+In Command Prompt 2:
+dot -Tsvg -O test.dot
+
+
+In Windows Explorer Window:
+Double-click test.dot.svg               # Or drag-drop to browser
+
+
+In Browser:
+View, discuss, zoom tree diagram
+
+
+Demo 2: Q&A (Q&A like ***base DecisionTree***, not LearningDecisionTree)
+========================================================================
+If not yet done:
+    python                                  # Start python
+    execfile('initLDT_stage3cancer.py')     # Create LDT with stage3cancer data
+
+ans = interview()
+ans
+ans['solution_path']
+ans['"pgstat"=0']
+
+
+Demo 3: Adding a new Training Record
+====================================
+python
+execfile('initLDT_stage3cancer.py')
+dt, root = dt1()                            # dt1() reads from stage3cancer.csv
+                                            # and writes to stage3cancer_v2.csv
+dt.getDOT(outFile = 'test.dot', allProbsOnLeaf = True)  # Do dot in other window
+walkAndRecord()                             # Non-interactive walk through
+                                            # questions while recording, and
+                                            # regenerates tree
+dt.show_training_data()                     # Note new sample_147
+dt.getDOT(outFile = 'test_v2.dot', allProbsOnLeaf = True)  # Tree is different!
+
+    # So far, have shown ability to:
+    #   * Walk tree while recording actions
+    #   * Use recorded steps to create seed training record
+    #   * Tweak seed record
+    #   * Add training data and regen tree all dynamically with one tree object
+
+dt.saveTrainingData()                       # Save to stage3cancer_v2.csv
+
+dt, root = dt2()                            # dt2() reads stage3cancer_v2.csv
+                                            # and writes stage3cancer_v3.csv
+dt.show_training_data()                     # Note new sample_147
+dt.getDOT(outFile = 'test_v3.dot', allProbsOnLeaf = True)  # Same as test_v2.dot
+
+    # Now confirmed saving new training data works, and it can be read/used
+
+
+Demo 4: Showing Poor and Good Training Data
+===========================================
+Not ready, need to explore data and try many runs manually to come up with
+something
+
+
+Miscellaneous Notes
+===================
+
+To examine an individual node with serial number 6:
+dt.getNodeDict()[6].display_node()          # dt.getNodeDict()[6] is a DTNode
+dt.getNodeDict()[6].get_children()          # Returns a list
+dt.getNodeDict()[6].get_children()[0]       # A DTNode, child index 1
+for child in dt.getNodeDict()[6].get_children(): child.display_node()
+
+
+Info about Base DecisionTree
+============================
+Overview
+https://engineering.purdue.edu/kak/distDT/DecisionTree-3.4.3.html
+
+Functions on DT and DTNode
+https://engineering.purdue.edu/kak/distDT/DecisionTree-3.4.3.html#DecisionTree
+https://engineering.purdue.edu/kak/distDT/DecisionTree-3.4.3.html#DTNode

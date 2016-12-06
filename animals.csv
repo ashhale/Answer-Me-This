@@ -1,0 +1,13 @@
+,animal,legs,hooved,farm,size,habitat
+1,horse,4,yes,yes,large,NA
+2,duck,2,no,sometimes,small,shoreline
+3,jaguar,4,no,no,medium,rainforest
+4,lion,4,no,no,medium,prarie
+5,wolf,4,no,no,medium,forest
+6,walrus,0,no,no,large,shoreline
+7,goldfish,0,no,no,tiny,water
+8,owl,2,no,no,small,forest
+9,giraffe,4,yes,no,large,prarie
+10,water buffalo,4,yes,no,large,prarie
+11,humpback whale,0,no,no,gigantic,water
+12,elephant,4,no,no,huge,prarie

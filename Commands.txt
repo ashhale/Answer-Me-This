@@ -1,0 +1,1 @@
+dot -Tsvg -O .\test_get_dot.dot
