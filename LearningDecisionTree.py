@@ -681,6 +681,9 @@ class LearningDecisionTree(DecisionTree.DecisionTree):
                 print m                         # End of "Moved to node" line
             print                               # Blank between prompts
 
+        # TODO:Instead of returning, do partial seeded record,
+        # make a second loop to prompt the user for new values in the seeded record
+        # where the seeded record values are currently NA
         return self.seedTrainingRecordWithQandA()
             
     def prompt(self, node):

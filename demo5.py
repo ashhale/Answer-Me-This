@@ -6,8 +6,9 @@ dt, root = dt1()                            # dt1() reads from stage3cancer.csv
                                             # and writes to stage3cancer_v2.csv
 dt.getDOT(outFile = 'test.dot', allProbsOnLeaf = True)  # Do dot in other window
 subprocess.call(['dot', '-Tsvg', '-O', 'test.dot'])     # Call Graphviz to make diagram
-#webbrowser.open('file://%s/test.dot.svg' % os.getcwd()) # Open diagram in browser
+webbrowser.open('file://%s\\test.dot.svg' % os.getcwd()) # Open diagram in browser
 
+#TODO: UI to prompt the user to update the entries in rec that have value NA line 12-34
 rec = dt.train(displayMoves = True)         # Interactive!
                                             # Answer 2, 4, 2.6, 47
                                             # Returns a seeded record
@@ -43,7 +44,7 @@ root_node = dt.construct_decision_tree_classifier()     # Required
 # dt.show_training_data()                     # Note new sample_147
 dt.getDOT(outFile = 'test_v2.dot', allProbsOnLeaf = True)  # Tree is different!
 subprocess.call(['dot', '-Tsvg', '-O', 'test_v2.dot'])  # Call Graphviz to make diagram
-#webbrowser.open('file://%s/test_v2.dot.svg' % os.getcwd())  # Open diagram in browser
+webbrowser.open('file://%s\\test_v2.dot.svg' % os.getcwd())  # Open diagram in browser
 
     # So far, have shown ability to:
     #   * Interactively walk tree while recording answers and node path
@@ -58,6 +59,6 @@ dt, root = dt2()                            # dt2() reads stage3cancer_v2.csv
 # dt.show_training_data()                     # Note new sample_147
 dt.getDOT(outFile = 'test_v3.dot', allProbsOnLeaf = True)  # Same as test_v2.dot
 subprocess.call(['dot', '-Tsvg', '-O', 'test_v3.dot']) # Call Graphviz to make diagram
-#webbrowser.open('file://%s/test_v3.dot.svg' % os.getcwd())  # Open diagram in browser
+webbrowser.open('file://%s\\test_v3.dot.svg' % os.getcwd())  # Open diagram in browser
 
     # Now confirmed saving new training data works, and it can be read/used
