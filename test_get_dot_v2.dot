@@ -1,0 +1,22 @@
+digraph G {
+  node [shape=box]
+  "NODE 0" [label="0: \"grade\"\n[]\l"]
+    "NODE 0" -> "NODE 1";
+    "NODE 0" -> "NODE 2";
+    "NODE 0" -> "NODE 9";
+  "NODE 1" [label="1: ['1.000', '0.000']\n['\"grade\"=1.0']\l"; style="rounded, bold"]
+  "NODE 2" [label="2: \"gleason\"\n['\"grade\"=2.0']\l"]
+    "NODE 2" -> "NODE 3";
+    "NODE 2" -> "NODE 4";
+    "NODE 2" -> "NODE 5";
+    "NODE 2" -> "NODE 7";
+  "NODE 3" [label="3: ['0.000', '1.000']\n['\"grade\"=2.0',\l'\"gleason\"=10.0']\l"; style="rounded, bold"]
+  "NODE 4" [label="4: ['1.000', '0.000']\n['\"grade\"=2.0',\l'\"gleason\"=3.0']\l"; style="rounded, bold"]
+  "NODE 5" [label="5: \"g2\"\n['\"grade\"=2.0',\l'\"gleason\"=4.0']\l"]
+    "NODE 5" -> "NODE 6";
+  "NODE 6" [label="6: ['0.998', '0.002']\n['\"grade\"=2.0',\l'\"gleason\"=4.0',\l'\"g2\"<2.4']\l"; style="rounded, bold"]
+  "NODE 7" [label="7: \"g2\"\n['\"grade\"=2.0',\l'\"gleason\"=5.0']\l"]
+    "NODE 7" -> "NODE 8";
+  "NODE 8" [label="8: ['0.999', '0.001']\n['\"grade\"=2.0',\l'\"gleason\"=5.0',\l'\"g2\"<2.4']\l"; style="rounded, bold"]
+  "NODE 9" [label="9: ['0.000', '1.000']\n['\"grade\"=4.0']\l"; style="rounded, bold"]
+}

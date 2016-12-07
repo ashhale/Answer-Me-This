@@ -11,7 +11,7 @@ training_datafile = "animals.csv"
 dt = LearningDecisionTree.LearningDecisionTree( training_datafile = training_datafile,
                                 csv_class_column_index = 1,
                                 csv_columns_for_features = [2,3,4,5,6],
-                                entropy_threshold = 0.00000000001,
+                                entropy_threshold = 0.01,
                                 # max_depth_desired = 8,
                               )
 dt.get_training_data()

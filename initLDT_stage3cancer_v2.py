@@ -8,15 +8,15 @@ import subprocess
 import webbrowser
 import os
 
-training_datafile = "stage3cancer.csv"
-training_datafile2 = "stage3cancer_v2.csv"
-training_datafile3 = "stage3cancer_v3.csv"
+training_datafile = "stage3cancer_v2.csv"
+training_datafile2 = "stage3cancer_v2.2.csv"
+training_datafile3 = "stage3cancer_v3.2.csv"
 
 def dt1():
     dt = LearningDecisionTree(
                                     training_datafile = training_datafile,
-                                    csv_class_column_index = 2,
-                                    csv_columns_for_features = [3,4,5,6,7,8],
+                                    csv_class_column_index = 1,
+                                    csv_columns_for_features = [2,3,4,5,6,7],
                                     entropy_threshold = 0.01,
                                     max_depth_desired = 8,
                                     save_training_datafile = training_datafile2,
