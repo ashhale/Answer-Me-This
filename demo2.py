@@ -2,6 +2,7 @@
 # ========================================================================
 # python                                  # Start python
 execfile('initLDT_stage3cancer.py')     # Create LDT with stage3cancer data
+dt, root_node = dt1()
 
 ans = interview()
 ans
