@@ -1,0 +1,84 @@
+digraph G {
+  node [shape=box]
+  "NODE 0" [label="0: median\n[]\l"]
+    "NODE 0" -> "NODE 1";
+    "NODE 0" -> "NODE 38";
+  "NODE 1" [label="1: median\n['median<0.169856605']\l"]
+    "NODE 1" -> "NODE 2";
+  "NODE 2" [label="2: centroid\n['median<0.169856605',\l'median>0.107757513']\l"]
+    "NODE 2" -> "NODE 3";
+    "NODE 2" -> "NODE 20";
+  "NODE 3" [label="3: meanfreq\n['median<0.169856605',\l'median>0.107757513',\l'centroid<0.191212497']\l"]
+    "NODE 3" -> "NODE 4";
+    "NODE 3" -> "NODE 19";
+  "NODE 4" [label="4: sd\n['median<0.169856605',\l'median>0.107757513',\l'centroid<0.191212497',\l'meanfreq<0.191212497']\l"]
+    "NODE 4" -> "NODE 5";
+    "NODE 4" -> "NODE 10";
+  "NODE 5" [label="5: centroid\n['median<0.169856605',\l'median>0.107757513',\l'centroid<0.191212497',\l'meanfreq<0.191212497',\l'sd<0.059710356']\l"]
+    "NODE 5" -> "NODE 6";
+    "NODE 5" -> "NODE 8";
+  "NODE 6" [label="6: centroid\n['median<0.169856605',\l'median>0.107757513',\l'centroid<0.191212497',\l'meanfreq<0.191212497',\l'sd<0.059710356',\l'centroid<0.162389797']\l"]
+    "NODE 6" -> "NODE 7";
+  "NODE 7" [label="7: [label=male => 0.999]\n['median<0.169856605',\l'median>0.107757513',\l'centroid<0.191212497',\l'meanfreq<0.191212497',\l'sd<0.059710356',\l'centroid<0.162389797',\l'centroid>0.147401993']\l"; style="rounded, bold"]
+  "NODE 8" [label="8: centroid\n['median<0.169856605',\l'median>0.107757513',\l'centroid<0.191212497',\l'meanfreq<0.191212497',\l'sd<0.059710356',\l'centroid>0.162389797']\l"]
+    "NODE 8" -> "NODE 9";
+  "NODE 9" [label="9: [label=male => 0.999]\n['median<0.169856605',\l'median>0.107757513',\l'centroid<0.191212497',\l'meanfreq<0.191212497',\l'sd<0.059710356',\l'centroid>0.162389797',\l'centroid<0.181989233']\l"; style="rounded, bold"]
+  "NODE 10" [label="10: sd\n['median<0.169856605',\l'median>0.107757513',\l'centroid<0.191212497',\l'meanfreq<0.191212497',\l'sd>0.059710356']\l"]
+    "NODE 10" -> "NODE 11";
+    "NODE 10" -> "NODE 13";
+  "NODE 11" [label="11: mode\n['median<0.169856605',\l'median>0.107757513',\l'centroid<0.191212497',\l'meanfreq<0.191212497',\l'sd>0.059710356',\l'sd<0.083930644']\l"]
+    "NODE 11" -> "NODE 12";
+  "NODE 12" [label="12: [label=male => 0.999]\n['median<0.169856605',\l'median>0.107757513',\l'centroid<0.191212497',\l'meanfreq<0.191212497',\l'sd>0.059710356',\l'sd<0.083930644',\l'mode>0.219959504']\l"; style="rounded, bold"]
+  "NODE 13" [label="13: centroid\n['median<0.169856605',\l'median>0.107757513',\l'centroid<0.191212497',\l'meanfreq<0.191212497',\l'sd>0.059710356',\l'sd>0.083930644']\l"]
+    "NODE 13" -> "NODE 14";
+    "NODE 13" -> "NODE 17";
+  "NODE 14" [label="14: centroid\n['median<0.169856605',\l'median>0.107757513',\l'centroid<0.191212497',\l'meanfreq<0.191212497',\l'sd>0.059710356',\l'sd>0.083930644',\l'centroid<0.162389797']\l"]
+    "NODE 14" -> "NODE 15";
+    "NODE 14" -> "NODE 16";
+  "NODE 15" [label="15: [label=male => 0.999]\n['median<0.169856605',\l'median>0.107757513',\l'centroid<0.191212497',\l'meanfreq<0.191212497',\l'sd>0.059710356',\l'sd>0.083930644',\l'centroid<0.162389797',\l'centroid<0.133567097']\l"; style="rounded, bold"]
+  "NODE 16" [label="16: [label=male => 0.999]\n['median<0.169856605',\l'median>0.107757513',\l'centroid<0.191212497',\l'meanfreq<0.191212497',\l'sd>0.059710356',\l'sd>0.083930644',\l'centroid<0.162389797',\l'centroid>0.133567097']\l"; style="rounded, bold"]
+  "NODE 17" [label="17: centroid\n['median<0.169856605',\l'median>0.107757513',\l'centroid<0.191212497',\l'meanfreq<0.191212497',\l'sd>0.059710356',\l'sd>0.083930644',\l'centroid>0.162389797']\l"]
+    "NODE 17" -> "NODE 18";
+  "NODE 18" [label="18: [label=male => 0.999]\n['median<0.169856605',\l'median>0.107757513',\l'centroid<0.191212497',\l'meanfreq<0.191212497',\l'sd>0.059710356',\l'sd>0.083930644',\l'centroid>0.162389797',\l'centroid<0.181989233']\l"; style="rounded, bold"]
+  "NODE 19" [label="19: [label=female => 1.000]\n['median<0.169856605',\l'median>0.107757513',\l'centroid<0.191212497',\l'meanfreq>0.191212497']\l"; style="rounded, bold"]
+  "NODE 20" [label="20: meanfreq\n['median<0.169856605',\l'median>0.107757513',\l'centroid>0.191212497']\l"]
+    "NODE 20" -> "NODE 21";
+    "NODE 20" -> "NODE 37";
+  "NODE 21" [label="21: centroid\n['median<0.169856605',\l'median>0.107757513',\l'centroid>0.191212497',\l'meanfreq<0.191212497']\l"]
+    "NODE 21" -> "NODE 22";
+    "NODE 21" -> "NODE 27";
+  "NODE 22" [label="22: centroid\n['median<0.169856605',\l'median>0.107757513',\l'centroid>0.191212497',\l'meanfreq<0.191212497',\l'centroid<0.195824129']\l"]
+    "NODE 22" -> "NODE 23";
+    "NODE 22" -> "NODE 25";
+  "NODE 23" [label="23: centroid\n['median<0.169856605',\l'median>0.107757513',\l'centroid>0.191212497',\l'meanfreq<0.191212497',\l'centroid<0.195824129',\l'centroid<0.193518313']\l"]
+    "NODE 23" -> "NODE 24";
+  "NODE 24" [label="24: [label=male => 0.999]\n['median<0.169856605',\l'median>0.107757513',\l'centroid>0.191212497',\l'meanfreq<0.191212497',\l'centroid<0.195824129',\l'centroid<0.193518313',\l'centroid<0.192365405']\l"; style="rounded, bold"]
+  "NODE 25" [label="25: centroid\n['median<0.169856605',\l'median>0.107757513',\l'centroid>0.191212497',\l'meanfreq<0.191212497',\l'centroid<0.195824129',\l'centroid>0.193518313']\l"]
+    "NODE 25" -> "NODE 26";
+  "NODE 26" [label="26: [label=male => 0.999]\n['median<0.169856605',\l'median>0.107757513',\l'centroid>0.191212497',\l'meanfreq<0.191212497',\l'centroid<0.195824129',\l'centroid>0.193518313',\l'centroid<0.194671221']\l"; style="rounded, bold"]
+  "NODE 27" [label="27: centroid\n['median<0.169856605',\l'median>0.107757513',\l'centroid>0.191212497',\l'meanfreq<0.191212497',\l'centroid>0.195824129']\l"]
+    "NODE 27" -> "NODE 28";
+    "NODE 27" -> "NODE 32";
+  "NODE 28" [label="28: centroid\n['median<0.169856605',\l'median>0.107757513',\l'centroid>0.191212497',\l'meanfreq<0.191212497',\l'centroid>0.195824129',\l'centroid<0.199282853']\l"]
+    "NODE 28" -> "NODE 29";
+    "NODE 28" -> "NODE 31";
+  "NODE 29" [label="29: sd\n['median<0.169856605',\l'median>0.107757513',\l'centroid>0.191212497',\l'meanfreq<0.191212497',\l'centroid>0.195824129',\l'centroid<0.199282853',\l'centroid<0.196977037']\l"]
+    "NODE 29" -> "NODE 30";
+  "NODE 30" [label="30: [label=male => 0.999]\n['median<0.169856605',\l'median>0.107757513',\l'centroid>0.191212497',\l'meanfreq<0.191212497',\l'centroid>0.195824129',\l'centroid<0.199282853',\l'centroid<0.196977037',\l'sd<0.059710356']\l"; style="rounded, bold"]
+  "NODE 31" [label="31: [label=male => 0.999]\n['median<0.169856605',\l'median>0.107757513',\l'centroid>0.191212497',\l'meanfreq<0.191212497',\l'centroid>0.195824129',\l'centroid<0.199282853',\l'centroid>0.196977037']\l"; style="rounded, bold"]
+  "NODE 32" [label="32: centroid\n['median<0.169856605',\l'median>0.107757513',\l'centroid>0.191212497',\l'meanfreq<0.191212497',\l'centroid>0.195824129',\l'centroid>0.199282853']\l"]
+    "NODE 32" -> "NODE 33";
+    "NODE 32" -> "NODE 35";
+  "NODE 33" [label="33: sd\n['median<0.169856605',\l'median>0.107757513',\l'centroid>0.191212497',\l'meanfreq<0.191212497',\l'centroid>0.195824129',\l'centroid>0.199282853',\l'centroid<0.200435761']\l"]
+    "NODE 33" -> "NODE 34";
+  "NODE 34" [label="34: [label=male => 1.000]\n['median<0.169856605',\l'median>0.107757513',\l'centroid>0.191212497',\l'meanfreq<0.191212497',\l'centroid>0.195824129',\l'centroid>0.199282853',\l'centroid<0.200435761',\l'sd<0.059710356']\l"; style="rounded, bold"]
+  "NODE 35" [label="35: centroid\n['median<0.169856605',\l'median>0.107757513',\l'centroid>0.191212497',\l'meanfreq<0.191212497',\l'centroid>0.195824129',\l'centroid>0.199282853',\l'centroid>0.200435761']\l"]
+    "NODE 35" -> "NODE 36";
+  "NODE 36" [label="36: [label=male => 0.999]\n['median<0.169856605',\l'median>0.107757513',\l'centroid>0.191212497',\l'meanfreq<0.191212497',\l'centroid>0.195824129',\l'centroid>0.199282853',\l'centroid>0.200435761',\l'centroid>0.205047393']\l"; style="rounded, bold"]
+  "NODE 37" [label="37: [label=female => 1.000]\n['median<0.169856605',\l'median>0.107757513',\l'centroid>0.191212497',\l'meanfreq>0.191212497']\l"; style="rounded, bold"]
+  "NODE 38" [label="38: median\n['median>0.169856605']\l"]
+    "NODE 38" -> "NODE 39";
+  "NODE 39" [label="39: median\n['median>0.169856605',\l'median>0.192575785']\l"]
+    "NODE 39" -> "NODE 40";
+  "NODE 40" [label="40: [label=female => 1.000]\n['median>0.169856605',\l'median>0.192575785',\l'median<0.207721905']\l"; style="rounded, bold"]
+}

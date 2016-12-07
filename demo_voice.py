@@ -6,18 +6,18 @@
 # 
 # In Command Prompt 1:
 # python                                  # Start python
-execfile('initLDT_voice.py')     # Create LDT with stage3cancer data
-dt, root = dt1()                            # dt1() reads from stage3cancer.csv
-                                            # and writes to stage3cancer_v2.csv
-dt.getDOT(outFile = 'test.dot')         # Generate file test.dot
+execfile('initLDT_voice.py')              # Create LDT with voice_small data
+dt, root = dt1()                          # dt1() reads from voice_small.csv
+                                          # and writes to stage3cancer_v2.csv
+dt.getDOT(outFile = 'test_voice.dot')     # Generate file test_voice.dot
 
 
 # In Command Prompt 2:
-# dot -Tsvg -O test.dot
+# dot -Tsvg -O test_voice.dot
 # 
 # 
 # In Windows Explorer Window:
-# Double-click test.dot.svg               # Or drag-drop to browser
+# Double-click test_voice.dot.svg               # Or drag-drop to browser
 # 
 # 
 # In Browser:
