@@ -7,8 +7,11 @@ dt, root = dt1()                            # dt1() reads from stage3cancer.csv
 dt.getDOT(outFile = 'test.dot', allProbsOnLeaf = True)  # Do dot in other window
 subprocess.call(['dot', '-Tsvg', '-O', 'test.dot'])     # Call Graphviz to make diagram
 webbrowser.open('file://%s\\test.dot.svg' % os.getcwd()) # Open diagram in browser
+# NOTE: This file will only work in Windows OS systems as is.
+# To run in a Unix-based OS system change lines 9, 50, and 65 to:
+# webbrowser.open('file://%s/test.dot.svg' % os.getcwd())
 
-#TODO: UI to prompt the user to update the entries in rec that have value NA line 12-34
+# TODO: UI to prompt the user to update the entries in rec that have value NA line 12-34
 rec = dt.train(displayMoves = True)         # Interactive!
                                             # Answer 2, 4, 2.6, 47
                                             # Returns a seeded record
