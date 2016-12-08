@@ -19,10 +19,6 @@
 #     generate a very nice graphical tree. For example, assuming getDOT()
 #     wrote its output to the file my_graph.dot, you can generate the file
 #     my_graph.dot.svg via the command line: dot -Tsvg -O my_graph.dot
-#
-# TODO: Allow for adding new class values (via seedTrainingRecordWithQandA),
-# new feature values (via new allowNewValues argument in chooseChild and
-# getDeepestChildForFeature), and new feature names (via ???)
 
 import DecisionTree
 from DecisionTree.DecisionTree import sample_index
@@ -97,8 +93,7 @@ class LearningDecisionTree(DecisionTree.DecisionTree):
         featureOrProbs = ''
         if leaf:
             classProbs = node.get_class_probabilities()
-            probsDisplay = ["%0.3f" %
-                                               x for x in classProbs]
+            probsDisplay = ["%0.3f" % x for x in classProbs]
             i = classProbs.index(max(classProbs))
 
             if allProbsOnLeaf:
@@ -231,25 +226,33 @@ class LearningDecisionTree(DecisionTree.DecisionTree):
                         return child
         else:
             found = False
-            pattern1 = r'(.+)<(.+)'
-            pattern2 = r'(.+)>(.+)'
-
             for child in node.get_children():
-                for fv in child.get_branch_features_and_values_or_thresholds():
-                    if re.search(pattern1, fv):
-                        m = re.search(pattern1, fv)
-                        f,threshold = m.group(1),m.group(2)
-                        if test_value <= float(threshold):
-                            found = True
-                        else:
-                            found = False
-                    elif re.search(pattern2, fv):
-                        m = re.search(pattern2, fv)
-                        f,threshold = m.group(1),m.group(2)
-                        if test_value > float(threshold):
-                            found = True
-                        else:
-                            found = False
+                # Get all the '<' and '>' clauses in the child for feature
+                lessThan = [x for x in 
+                            child.get_branch_features_and_values_or_thresholds()
+                            if x.split('<')[0] == feature]
+                greaterThan = [x for x in 
+                            child.get_branch_features_and_values_or_thresholds()
+                            if x.split('>')[0] == feature]
+
+                if lessThan:
+                    # We want to be <= ALL the '<' clauses
+                    if test_value <= min(convert(x.split('<')[1])
+                                                  for x in lessThan):
+                        found = True
+                    else:
+                        found = False
+                        continue        # Failed so don't test greaterThan
+                
+                if greaterThan:
+                    # We want to be > ALL the '>' clauses
+                    if test_value > max(convert(x.split('>')[1])
+                                                    for x in greaterThan):
+                        found = True
+                    else:
+                        found = False
+                        continue        # For symmetry :-)
+                
                 if found:
                     if self._recording:
                         self._path.append(child.get_serial_num())
@@ -283,6 +286,10 @@ class LearningDecisionTree(DecisionTree.DecisionTree):
             child = self.chooseChild(child, value)
         
         if child: deepest = child
+        
+        if deepest.get_feature() == feature:
+            return None
+        
         return deepest
 
     def addTrainingRecord(self, newRecord):
@@ -568,6 +575,9 @@ class LearningDecisionTree(DecisionTree.DecisionTree):
     def getQandAPath(self):
         '''
         Return a list of the recorded node moves from calls to chooseChild().
+        
+        If the last item in the list is None, then the responses did not lead
+        to an answer, which could mean more training data is needed.
         '''
         return self._path
 
@@ -640,7 +650,7 @@ class LearningDecisionTree(DecisionTree.DecisionTree):
             for child in node.get_children():
                 self.recurseNodeDict(child)
     
-    def train(self, displayMoves = False):
+    def train(self, displayMoves = False, displayAnswer = False):
         '''
         Recursively prompt the user to answer questions until reaching a leaf
         node, and return a seeded partial training record (see
@@ -649,8 +659,15 @@ class LearningDecisionTree(DecisionTree.DecisionTree):
         If displayMoves is True, after each question is answered, a message
         is displayed saying which node was reached.
         
+        If displayAnswer is True, before returning the seeded training record,
+        print a message describing the answer, including the probability of each
+        class value, and the node path followed.
+        
         To get the full path of all nodes visited at the end of training,
-        including intermediate nodes, see getQandAPath.
+        including intermediate nodes, see getQandAPath. The last node in
+        the path is the answer node, which can be examined via getNodeDict.
+        TODO: Consider returning the final DTNode also, perhaps a tuple with
+        the final DTNode and the seeded training record.
         
         This is intended as a simple demonstration of how to use the other
         methods in LearningDecisionTree to record Q&A from a user navigating
@@ -662,11 +679,24 @@ class LearningDecisionTree(DecisionTree.DecisionTree):
         node = self._root_node
         self.startQandA()                       # Start recording
         while len(node.get_children()) > 0:
-            value = self.prompt(node)
+            if node.get_feature() in self._answers:
+                value = self._answers[node.get_feature()]
+            else:
+                value = self.prompt(node)
             prevNode = node
             node = self.getDeepestChildForFeature(node, value)
+            if not node:
+                # Answers given do not lead to a match
+                self._path.append(None)
+                print
+                break
+
             if displayMoves:
-                print "Moved to node %d" % node.get_serial_num(),
+                print "%s=%s: Moved from node %d to node %d" % (
+                       prevNode.get_feature(),
+                       str(value),
+                       prevNode.get_serial_num(),
+                       node.get_serial_num()),
                 # Show intermediate nodes, if any
                 prevIdx = self._path.index(prevNode.get_serial_num())
                 curIdx = self._path.index(node.get_serial_num())
@@ -681,10 +711,34 @@ class LearningDecisionTree(DecisionTree.DecisionTree):
                 print m                         # End of "Moved to node" line
             print                               # Blank between prompts
 
-        # TODO:Instead of returning, do partial seeded record,
-        # make a second loop to prompt the user for new values in the seeded record
+        if displayAnswer:
+            if node:
+                classProbs = node.get_class_probabilities()
+                probsDisplay = ["%0.3f" % x for x in classProbs]
+                print("Classification:\n")
+                print("     "  + str.ljust("class name", 30) + "probability")    
+                print("     ----------                    -----------")
+                for i in range(len(node.get_class_names())):
+                    print("     "  + str.ljust(node.get_class_names()[i], 30)
+                          + probsDisplay[i])
+                print
+            else:
+                print '*** The responses did not lead to an answer ***'
+                print '***  Consider adding a new training record  ***\n'
+            
+        # Get a partial training record seeded with the Q&A answers and
+        # the class with the highest predicted probability (if answer found)
+        rec = self.seedTrainingRecordWithQandA()
+        if node:
+            classProbs = node.get_class_probabilities()
+            mostLikely = node.get_class_names()[classProbs.index(max(classProbs))]
+            rec[mostLikely.split('=')[0]] = mostLikely.split('=')[1]
+
+        # TODO:Instead of returning just  partial seeded record, make a
+        # second loop to prompt the user for new values in the seeded record
         # where the seeded record values are currently NA
-        return self.seedTrainingRecordWithQandA()
+        return rec
+
             
     def prompt(self, node):
         '''
