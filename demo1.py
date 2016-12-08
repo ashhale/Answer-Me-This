@@ -10,6 +10,8 @@ execfile('initLDT_stage3cancer.py')     # Create LDT with stage3cancer data
 dt, root = dt1()                            # dt1() reads from stage3cancer.csv
                                             # and writes to stage3cancer_v2.csv
 dt.getDOT(outFile = 'test.dot')         # Generate file test.dot
+subprocess.call(['dot', '-Tsvg', '-O', 'test.dot'])     # Call Graphviz to make diagram
+webbrowser.open('file://%s\\test.dot.svg' % os.getcwd()) # Open diagram in browser
 
 
 # In Command Prompt 2:

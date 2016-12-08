@@ -4,14 +4,14 @@ digraph G {
     "NODE 0" -> "NODE 1";
     "NODE 0" -> "NODE 2";
     "NODE 0" -> "NODE 29";
-  "NODE 1" [label="1: [\"pgstat\"=0 => 1.000]\n['\"grade\"=1.0']\l"; style="rounded, bold"]
+  "NODE 1" [label="1: ['1.000', '0.000']\n['\"grade\"=1.0']\l"; style="rounded, bold"]
   "NODE 2" [label="2: \"gleason\"\n['\"grade\"=2.0']\l"]
     "NODE 2" -> "NODE 3";
     "NODE 2" -> "NODE 4";
     "NODE 2" -> "NODE 5";
     "NODE 2" -> "NODE 26";
-  "NODE 3" [label="3: [\"pgstat\"=1 => 1.000]\n['\"grade\"=2.0',\l'\"gleason\"=10.0']\l"; style="rounded, bold"]
-  "NODE 4" [label="4: [\"pgstat\"=0 => 1.000]\n['\"grade\"=2.0',\l'\"gleason\"=3.0']\l"; style="rounded, bold"]
+  "NODE 3" [label="3: ['0.000', '1.000']\n['\"grade\"=2.0',\l'\"gleason\"=10.0']\l"; style="rounded, bold"]
+  "NODE 4" [label="4: ['1.000', '0.000']\n['\"grade\"=2.0',\l'\"gleason\"=3.0']\l"; style="rounded, bold"]
   "NODE 5" [label="5: \"g2\"\n['\"grade\"=2.0',\l'\"gleason\"=4.0']\l"]
     "NODE 5" -> "NODE 6";
     "NODE 5" -> "NODE 14";
@@ -20,16 +20,16 @@ digraph G {
     "NODE 6" -> "NODE 9";
   "NODE 7" [label="7: \"age\"\n['\"grade\"=2.0',\l'\"gleason\"=4.0',\l'\"g2\"<3.84',\l'\"g2\"<2.4']\l"]
     "NODE 7" -> "NODE 8";
-  "NODE 8" [label="8: [\"pgstat\"=0 => 1.000]\n['\"grade\"=2.0',\l'\"gleason\"=4.0',\l'\"g2\"<3.84',\l'\"g2\"<2.4',\l'\"age\"<49.0']\l"; style="rounded, bold"]
+  "NODE 8" [label="8: ['1.000', '0.000']\n['\"grade\"=2.0',\l'\"gleason\"=4.0',\l'\"g2\"<3.84',\l'\"g2\"<2.4',\l'\"age\"<49.0']\l"; style="rounded, bold"]
   "NODE 9" [label="9: \"g2\"\n['\"grade\"=2.0',\l'\"gleason\"=4.0',\l'\"g2\"<3.84',\l'\"g2\">2.4']\l"]
     "NODE 9" -> "NODE 10";
     "NODE 9" -> "NODE 12";
   "NODE 10" [label="10: \"age\"\n['\"grade\"=2.0',\l'\"gleason\"=4.0',\l'\"g2\"<3.84',\l'\"g2\">2.4',\l'\"g2\"<3.6']\l"]
     "NODE 10" -> "NODE 11";
-  "NODE 11" [label="11: [\"pgstat\"=0 => 1.000]\n['\"grade\"=2.0',\l'\"gleason\"=4.0',\l'\"g2\"<3.84',\l'\"g2\">2.4',\l'\"g2\"<3.6',\l'\"age\"<49.0']\l"; style="rounded, bold"]
+  "NODE 11" [label="11: ['1.000', '0.000']\n['\"grade\"=2.0',\l'\"gleason\"=4.0',\l'\"g2\"<3.84',\l'\"g2\">2.4',\l'\"g2\"<3.6',\l'\"age\"<49.0']\l"; style="rounded, bold"]
   "NODE 12" [label="12: \"age\"\n['\"grade\"=2.0',\l'\"gleason\"=4.0',\l'\"g2\"<3.84',\l'\"g2\">2.4',\l'\"g2\">3.6']\l"]
     "NODE 12" -> "NODE 13";
-  "NODE 13" [label="13: [\"pgstat\"=0 => 1.000]\n['\"grade\"=2.0',\l'\"gleason\"=4.0',\l'\"g2\"<3.84',\l'\"g2\">2.4',\l'\"g2\">3.6',\l'\"age\"<49.0']\l"; style="rounded, bold"]
+  "NODE 13" [label="13: ['1.000', '0.000']\n['\"grade\"=2.0',\l'\"gleason\"=4.0',\l'\"g2\"<3.84',\l'\"g2\">2.4',\l'\"g2\">3.6',\l'\"age\"<49.0']\l"; style="rounded, bold"]
   "NODE 14" [label="14: \"age\"\n['\"grade\"=2.0',\l'\"gleason\"=4.0',\l'\"g2\">3.84']\l"]
     "NODE 14" -> "NODE 15";
     "NODE 14" -> "NODE 24";
@@ -38,25 +38,25 @@ digraph G {
     "NODE 15" -> "NODE 18";
   "NODE 16" [label="16: \"g2\"\n['\"grade\"=2.0',\l'\"gleason\"=4.0',\l'\"g2\">3.84',\l'\"age\"<49.0',\l'\"g2\"<13.44']\l"]
     "NODE 16" -> "NODE 17";
-  "NODE 17" [label="17: [\"pgstat\"=0 => 0.999]\n['\"grade\"=2.0',\l'\"gleason\"=4.0',\l'\"g2\">3.84',\l'\"age\"<49.0',\l'\"g2\"<13.44',\l'\"g2\"<11.28']\l"; style="rounded, bold"]
+  "NODE 17" [label="17: ['0.999', '0.001']\n['\"grade\"=2.0',\l'\"gleason\"=4.0',\l'\"g2\">3.84',\l'\"age\"<49.0',\l'\"g2\"<13.44',\l'\"g2\"<11.28']\l"; style="rounded, bold"]
   "NODE 18" [label="18: \"g2\"\n['\"grade\"=2.0',\l'\"gleason\"=4.0',\l'\"g2\">3.84',\l'\"age\"<49.0',\l'\"g2\">13.44']\l"]
     "NODE 18" -> "NODE 19";
     "NODE 18" -> "NODE 22";
   "NODE 19" [label="19: \"age\"\n['\"grade\"=2.0',\l'\"gleason\"=4.0',\l'\"g2\">3.84',\l'\"age\"<49.0',\l'\"g2\">13.44',\l'\"g2\"<17.04']\l"]
     "NODE 19" -> "NODE 20";
     "NODE 19" -> "NODE 21";
-  "NODE 20" [label="20: [\"pgstat\"=0 => 0.999]\n['\"grade\"=2.0',\l'\"gleason\"=4.0',\l'\"g2\">3.84',\l'\"age\"<49.0',\l'\"g2\">13.44',\l'\"g2\"<17.04',\l'\"age\"<47.0']\l"; style="rounded, bold"]
-  "NODE 21" [label="21: [\"pgstat\"=0 => 0.999]\n['\"grade\"=2.0',\l'\"gleason\"=4.0',\l'\"g2\">3.84',\l'\"age\"<49.0',\l'\"g2\">13.44',\l'\"g2\"<17.04',\l'\"age\">47.0']\l"; style="rounded, bold"]
+  "NODE 20" [label="20: ['0.999', '0.001']\n['\"grade\"=2.0',\l'\"gleason\"=4.0',\l'\"g2\">3.84',\l'\"age\"<49.0',\l'\"g2\">13.44',\l'\"g2\"<17.04',\l'\"age\"<47.0']\l"; style="rounded, bold"]
+  "NODE 21" [label="21: ['0.999', '0.001']\n['\"grade\"=2.0',\l'\"gleason\"=4.0',\l'\"g2\">3.84',\l'\"age\"<49.0',\l'\"g2\">13.44',\l'\"g2\"<17.04',\l'\"age\">47.0']\l"; style="rounded, bold"]
   "NODE 22" [label="22: \"g2\"\n['\"grade\"=2.0',\l'\"gleason\"=4.0',\l'\"g2\">3.84',\l'\"age\"<49.0',\l'\"g2\">13.44',\l'\"g2\">17.04']\l"]
     "NODE 22" -> "NODE 23";
-  "NODE 23" [label="23: [\"pgstat\"=0 => 1.000]\n['\"grade\"=2.0',\l'\"gleason\"=4.0',\l'\"g2\">3.84',\l'\"age\"<49.0',\l'\"g2\">13.44',\l'\"g2\">17.04',\l'\"g2\">22.56']\l"; style="rounded, bold"]
+  "NODE 23" [label="23: ['1.000', '0.000']\n['\"grade\"=2.0',\l'\"gleason\"=4.0',\l'\"g2\">3.84',\l'\"age\"<49.0',\l'\"g2\">13.44',\l'\"g2\">17.04',\l'\"g2\">22.56']\l"; style="rounded, bold"]
   "NODE 24" [label="24: \"g2\"\n['\"grade\"=2.0',\l'\"gleason\"=4.0',\l'\"g2\">3.84',\l'\"age\">49.0']\l"]
     "NODE 24" -> "NODE 25";
-  "NODE 25" [label="25: [\"pgstat\"=0 => 0.983]\n['\"grade\"=2.0',\l'\"gleason\"=4.0',\l'\"g2\">3.84',\l'\"age\">49.0',\l'\"g2\"<8.88']\l"; style="rounded, bold"]
+  "NODE 25" [label="25: ['0.983', '0.017']\n['\"grade\"=2.0',\l'\"gleason\"=4.0',\l'\"g2\">3.84',\l'\"age\">49.0',\l'\"g2\"<8.88']\l"; style="rounded, bold"]
   "NODE 26" [label="26: \"g2\"\n['\"grade\"=2.0',\l'\"gleason\"=5.0']\l"]
     "NODE 26" -> "NODE 27";
   "NODE 27" [label="27: \"g2\"\n['\"grade\"=2.0',\l'\"gleason\"=5.0',\l'\"g2\"<3.84']\l"]
     "NODE 27" -> "NODE 28";
-  "NODE 28" [label="28: [\"pgstat\"=0 => 0.999]\n['\"grade\"=2.0',\l'\"gleason\"=5.0',\l'\"g2\"<3.84',\l'\"g2\"<2.4']\l"; style="rounded, bold"]
-  "NODE 29" [label="29: [\"pgstat\"=1 => 1.000]\n['\"grade\"=4.0']\l"; style="rounded, bold"]
+  "NODE 28" [label="28: ['0.999', '0.001']\n['\"grade\"=2.0',\l'\"gleason\"=5.0',\l'\"g2\"<3.84',\l'\"g2\"<2.4']\l"; style="rounded, bold"]
+  "NODE 29" [label="29: ['0.000', '1.000']\n['\"grade\"=4.0']\l"; style="rounded, bold"]
 }
